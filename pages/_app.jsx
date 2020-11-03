@@ -1,14 +1,12 @@
-import * as MDB from 'mdbreact'
-
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import "bootstrap-css-only/css/bootstrap.min.css";
 import "mdbreact/dist/css/mdb.css";
 
+import '../public/style.css'
+
 const App =
   (ctx) => (
-    <MDB.MDBContainer>
-      <ctx.Component {...ctx.pageProps} />
-    </MDB.MDBContainer>
+    <ctx.Component {...ctx.pageProps} />
   )
 
 export default App

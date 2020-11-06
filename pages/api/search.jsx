@@ -8,6 +8,7 @@ const Search =
     if (req.method !== 'GET') return
 
     const title = req.query.title
+    const page  = isNaN(req.query.page) ? 1 : req.query.page
     if (!title)
       return res.json(
         {
@@ -23,7 +24,8 @@ const Search =
         apikey: config.OMDB_API_KEY,
         s: title,
         type: 'movie',
-        y: year
+        y: year,
+        page
       }
     )
 

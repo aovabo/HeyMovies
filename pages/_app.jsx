@@ -4,9 +4,17 @@ import "mdbreact/dist/css/mdb.css";
 
 import '../public/style.css'
 
+import Head from 'next/head'
+
 const App =
   (ctx) => (
-    <ctx.Component {...ctx.pageProps} />
+    <div>
+      <Head>
+        <title>Site Name</title>
+      </Head>
+
+      <ctx.Component {...ctx.pageProps} />
+    </div>
   )
 
 export default App

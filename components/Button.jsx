@@ -44,12 +44,12 @@ class Button extends Component {
     if (typeof this.props.mouseClick === 'function')
       this.props.mouseClick(evt)
 
-    this.state.innerColor = this.props.innerColor2 || 'none'
-    this.setState(this.state)
-
     setTimeout(
       () => {
-        this.state.innerColor = this.props.innerColorOnHover
+        this.state.borderColor = this.props.borderColor
+        this.state.textColor   = this.props.textColor
+        this.state.innerColor  = this.props.innerColor
+
         this.setState(this.state)
       },
       150
@@ -70,6 +70,7 @@ class Button extends Component {
             color: this.state.textColor,
             backgroundColor: this.state.innerColor,
             outline: 'none',
+            backgroundImage: this.props.bgImage || 'none',
             ...this.props.style
           }
         }
@@ -77,6 +78,7 @@ class Button extends Component {
         onMouseEnter={this.mouseEntered}
         onMouseLeave={this.mouseLeft}
         onClick={this.mouseClick}
+        className={this.props.className || ''}
       >
         {this.props.children || null}
       </button>

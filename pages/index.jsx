@@ -1,170 +1,104 @@
-import { Component } from 'react'
-import * as MDB from 'mdbreact'
-
-import { withRouter } from 'next/router'
-import Button from '../components/Button'
+import axios from "axios";
+import { Component } from "react";
+import Link from "next/link";
+import Loading from "../components/Loading";
 
 class Index extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
-      '0': {
-        width: 150,
-        height: 225
-      },
-      
-      '1': {
-        width: 150,
-        height: 225
-      },
+      movies: [],
+      cursor: "default",
+    };
 
-      '2': {
-        width: 150,
-        height: 225
-      },
-
-      '3': {
-        width: 150,
-        height: 225
-      },
-
-      '4': {
-        width: 150,
-        height: 225
-      }
-    }
-
-    this.imageMouseEnter = this.imageMouseEnter.bind(this)
-    this.imageMouseLeave = this.imageMouseLeave.bind(this)
-    this.mouseClick      = this.mouseClick.bind(this)
+    this.mouseEnterImage = this.mouseEnterImage.bind(this);
+    this.mouseLeaveImage = this.mouseLeaveImage.bind(this);
   }
 
-  mouseClick() {
-    this.props.router.push('/movies')
+  mouseEnterImage() {
+    this.state.cursor = "pointer";
+    this.setState(this.state);
   }
 
-  imageMouseEnter(evt) {
-    const id = parseInt(evt.target.id)
-
-    this.state[id].width  += 25
-    this.state[id].height += 50
-
-    this.setState(this.state)
+  mouseLeaveImage() {
+    this.state.cursor = "default";
+    this.setState(this.state);
   }
 
-  imageMouseLeave(evt) {
-    const id = parseInt(evt.target.id)
+  async componentDidMount() {
+    this.setState(this.state);
 
-    this.state[id].width  -= 25
-    this.state[id].height -= 50
+    const result = await axios({
+      method: "GET",
+      url: "/api/movies/popular",
+    });
 
-    this.setState(this.state)
+    setTimeout(() => {
+      this.state.movies = result.data.status_data.results.slice(0, 5);
+      this.setState(this.state);
+    }, 2000);
   }
 
   render() {
     return (
-      <div style={
-          {
-            marginBottom: '20px'
-          }
-        }
-      >
-        <MDB.MDBJumbotron className='bg-transparent mb-0 rounded-0 shadow-none border-0'>
-          <center>
-            <h1 className='text-white'>
-              <strong>Site Name</strong>
-            </h1>
+      <div>
+        <section className="hero is-medium text-white is-bold">
+          <div className="hero-body">
+            <div className="container has-text-centered">
+              <h1 className="title has-text-white">Site Name</h1>
+              <h2 className="subtitle has-text-white">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc
+                consectetur, leo a semper molestie, quam lorem porta urna, et
+                blandit ipsum sem at nibh. Donec velit nisl, congue eu bibendum
+                nec, maximus id felis. Suspendisse risus justo, laoreet non
+                commodo porta, eleifend quis velit. Sed nisi diam, consequat
+                placerat libero nec, elementum commodo leo. Proin vestibulum
+                tortor eros, non venenatis lorem scelerisque non. Vestibulum
+                consequat augue non orci scelerisque scelerisque. Vivamus
+                scelerisque pellentesque ex in mollis. Pellentesque scelerisque
+                ut tellus ac hendrerit. Praesent eros odio, sollicitudin eget
+                justo a, sagittis pellentesque elit. In viverra, urna a finibus
+                porta, velit lectus facilisis dui, sit amet hendrerit turpis
+                lorem ut leo. Integer consectetur egestas magna at euismod.
+              </h2>
+            </div>
+          </div>
+        </section>
 
-            <p className='mt-3 text-white w-50'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <div className="container">
+          <hr />
+        </div>
 
-            <Button
-              borderColor='white'
-              innerColor='#00000000'
-              innerColorOnHover='white'
-              textColor='white'
-              textColorOnHover='black'
-              mouseClick={this.mouseClick}
-            >
-              <div style={
-                  {
-                    margin: '5px 20px 5px 20px'
-                  }
-                }
-              >
-                Search for Movies
-              </div>
-            </Button>
-          </center>
-        </MDB.MDBJumbotron>
-
-        <hr className='bg-light w-75' />
-
-        <MDB.Card className='bg-transparent rounded-0 shadow-none'>
-          <MDB.MDBContainer>
-            <center>
-              <h3 className='text-white'>Top Movies per Category</h3>
-
+        <section>
+          <div className="has-text-centered">
+            <h1 className="title has-text-white">5 Most Popular Movies</h1>
+            {this.state.movies.length < 1 ? (
+              <Loading />
+            ) : (
               <div>
-                {['', '', '', '', ''].map(
-                    (_, index) => (
-                      <a
-                        href='#'
-                        key={index}
-                      >
-                        <img
-                          id={index}
-                          className='rounded'
-                          src='/images/image.jpg'
-                          width={this.state[index].width}
-                          height={this.state[index].height}
-                          onMouseEnter={this.imageMouseEnter}
-                          onMouseLeave={this.imageMouseLeave}
-                          onClick={this.imageClick}
-                          style={
-                            {
-                              transition: '.3s',
-                              margin: '0px 5px 5px 0px'
-                            }
-                          }
-                        />
-                      </a>
-                    )
-                  )
-                }
+                {this.state.movies.map((movie, index) => (
+                  <Link key={index} href={`/movie/${movie.id}`}>
+                    <img
+                      style={{
+                        cursor: this.state.cursor,
+                      }}
+                      onMouseEnter={this.mouseEnterImage}
+                      onMouseLeave={this.mouseLeaveImage}
+                      className="mx-3 mb-3"
+                      src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
+                      width={150}
+                      height={225}
+                    />
+                  </Link>
+                ))}
               </div>
-            </center>
-          </MDB.MDBContainer>
-        </MDB.Card>
-
-        <hr className='w-75 mw-75 bg-light' />
-        <MDB.MDBCard className='bg-transparent shadow-none'>
-          <MDB.MDBContainer>
-            <center className='text-white'>
-              <h4>Want to nominate a movie?</h4>
-              <Button
-                borderColor='white'
-                innerColor='#00000000'
-                innerColorOnHover='white'
-                textColor='white'
-                textColorOnHover='black'
-              >
-                <p
-                  style={
-                    {
-                      margin: '5px 20px 5px 20px'
-                    }
-                  }
-                >
-                  Login to Nominate
-                </p>
-              </Button>
-            </center>
-          </MDB.MDBContainer>
-        </MDB.MDBCard>
+            )}
+          </div>
+        </section>
       </div>
-    )
+    );
   }
 }
 
-export default withRouter(Index)
+export default Index;

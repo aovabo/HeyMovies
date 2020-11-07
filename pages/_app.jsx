@@ -1,20 +1,15 @@
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import "bootstrap-css-only/css/bootstrap.min.css";
-import "mdbreact/dist/css/mdb.css";
+import "bulma/css/bulma.min.css";
+import "../public/style.css";
+import Head from "next/head";
 
-import '../public/style.css'
+const App = (ctx) => (
+  <div>
+    <Head>
+      <title>Site Name</title>
+    </Head>
 
-import Head from 'next/head'
+    <ctx.Component {...ctx.pageProps} />
+  </div>
+);
 
-const App =
-  (ctx) => (
-    <div>
-      <Head>
-        <title>Site Name</title>
-      </Head>
-
-      <ctx.Component {...ctx.pageProps} />
-    </div>
-  )
-
-export default App
+export default App;

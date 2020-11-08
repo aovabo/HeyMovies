@@ -23,7 +23,6 @@ class Movie extends Component {
     }
 
     this.state.movie = response.data.status_data;
-    console.log(this.state.movie);
     this.setState(this.state);
   }
 
@@ -39,16 +38,28 @@ class Movie extends Component {
                   width={150}
                   height={225}
                 />
-                <p className="title is-size-4">
+                <div className="title is-size-4">
                   {this.state.movie.title}
-                  <p className="subtitle is-6">
+                  <div className="subtitle is-6">
                     By:{" "}
                     {this.state.movie.production_companies
                       .map((prod) => prod.name)
                       .join(", ")}
-                  </p>
-                  <p className="subtitle is-6">Nominations: 0</p>
-                </p>
+                    <div className="subtitle is-6">
+                      Nominations: <strong>0</strong>
+                    </div>
+                    <div className="columns is-centered">
+                      <div className="column is-one-fifth">
+                        <p>Average Vote: {this.state.movie.vote_average}/10</p>
+                        <progress
+                          className="progress is-success"
+                          value={this.state.movie.vote_average}
+                          max="10"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div>
                   {this.state.movie.adult ? (
                     <span className="tag is-danger ml-1">Adult</span>
@@ -70,6 +81,11 @@ class Movie extends Component {
                     <p>{this.state.movie.overview}</p>
                   </div>
                 </div>
+
+                <hr className="mx-6 my-2 has-background-grey" />
+                <button className="button is-dark is-radiusless">
+                  Nominate this Movie
+                </button>
               </div>
             </div>
           ) : (

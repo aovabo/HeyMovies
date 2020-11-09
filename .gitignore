@@ -105,3 +105,10 @@ dist
 
 # Ignore config.json
 config.json
+
+# Ignore output file
+/Manager/out
+
+# ignore some folders
+.next
+.vscode

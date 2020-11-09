@@ -4,7 +4,7 @@ import querystring from "querystring";
 
 const Popular = async (req, res) => {
   if (req.method !== "GET")
-    return res.json({
+    return res.status(404).json({
       status_code: 404,
       status_error: true,
       status_message: "Invalid API Route.",

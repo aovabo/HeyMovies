@@ -1,10 +1,11 @@
 import axios from "axios";
 import config from "../../../config.json";
 import querystring from "querystring";
+import Database from "../../../utils/Database";
 
 const Movie = async (req, res) => {
   if (req.method !== "GET")
-    return res.json({
+    return res.status(404).json({
       status_code: 404,
       status_error: true,
       status_message: "Invalid API Route.",
@@ -26,6 +27,14 @@ const Movie = async (req, res) => {
     method: "GET",
     url,
   });
+
+  const collection = await Database();
+  const movieData = await collection.findOne({
+    isMovie: true,
+    id: result.data.id,
+  });
+
+  result.data.nominations = movieData?.nominations || 0;
 
   return res.json({
     status_code: 200,

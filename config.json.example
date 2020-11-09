@@ -1,4 +1,8 @@
 {
   "API_KEY": "API_KEY",
-  "API_URL": "https://api.themoviedb.org/3"
+  "API_URL": "https://api.themoviedb.org/3",
+  "DATABASE": {
+    "USERNAME": "DB_USERNAME",
+    "PASSWORD": "DB_PASSWORD"
+  }
 }

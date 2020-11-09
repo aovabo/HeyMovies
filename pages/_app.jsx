@@ -5,7 +5,7 @@ import Head from "next/head";
 const App = (ctx) => (
   <div>
     <Head>
-      <title>Site Name</title>
+      <title>HeyMovies</title>
     </Head>
 
     <ctx.Component {...ctx.pageProps} />

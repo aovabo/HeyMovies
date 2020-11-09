@@ -1,13 +1,21 @@
 import { Component } from "react";
 import axios from "axios";
 import Loading from "../../components/Loading";
+import { withRouter } from "next/router";
 
 class Movie extends Component {
-  state = {
-    movie: null,
-    hasLoaded: false,
-    error: "",
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      movie: null,
+      hasLoaded: false,
+      error: "",
+      success: "",
+    };
+
+    this.onNominate = this.onNominate.bind(this);
+  }
 
   async componentDidMount() {
     const response = await axios({
@@ -23,6 +31,56 @@ class Movie extends Component {
     }
 
     this.state.movie = response.data.status_data;
+    this.setState(this.state);
+  }
+
+  async onNominate(type) {
+    this.state.error = "";
+    this.state.success = "";
+
+    this.setState(this.state);
+
+    const sessionKey = localStorage.getItem("SESSION_KEY");
+    if (!sessionKey) {
+      this.state.error = "Not logged in. Redirecting to auth page...";
+      this.setState(this.state);
+
+      return setTimeout(() => {
+        this.props.router.push("/auth");
+      }, 2000);
+    }
+
+    const result = await axios({
+      method: type === "DEL" ? "DELETE" : "POST",
+      url: `/api/movie/nominate`,
+      headers: {
+        Authorization: `Auth ${sessionKey}`,
+      },
+      data: {
+        movie: this.state.movie.id,
+      },
+    });
+
+    if (result.data.status_remove_key) {
+      localStorage.removeItem("SESSION_KEY");
+
+      this.state.error =
+        result.data.status_message + " Redirecting to auth page...";
+      this.setState(this.state);
+
+      return setTimeout(() => {
+        this.props.router.push("/auth");
+      }, 2000);
+    }
+
+    if (result.data.status_error) {
+      this.state.error = result.data.status_message;
+      return this.setState(this.state);
+    }
+
+    this.state.success = result.data.status_message;
+    this.state.movie.nominations = result.data.status_data.nominations;
+
     this.setState(this.state);
   }
 
@@ -46,7 +104,8 @@ class Movie extends Component {
                       .map((prod) => prod.name)
                       .join(", ")}
                     <div className="subtitle is-6">
-                      Nominations: <strong>0</strong>
+                      Nominations:{" "}
+                      <strong>{this.state.movie.nominations || 0}</strong>
                     </div>
                     <div className="columns is-centered">
                       <div className="column is-one-fifth">
@@ -83,9 +142,20 @@ class Movie extends Component {
                 </div>
 
                 <hr className="mx-6 my-2 has-background-grey" />
-                <button className="button is-dark is-radiusless">
+                <button
+                  onClick={this.onNominate}
+                  className="mb-2 button is-dark is-radiusless"
+                >
                   Nominate this Movie
                 </button>
+                <button
+                  onClick={() => this.onNominate("DEL")}
+                  className="ml-2 button is-dark is-radiusless"
+                >
+                  Remove from Nomination
+                </button>
+                <p className="has-text-danger">{this.state.error}</p>
+                <p className="has-text-primary">{this.state.success}</p>
               </div>
             </div>
           ) : (
@@ -103,4 +173,4 @@ Movie.getInitialProps = (ctx) => ({
   id: ctx.query.id,
 });
 
-export default Movie;
+export default withRouter(Movie);

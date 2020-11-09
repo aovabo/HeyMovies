@@ -4,7 +4,7 @@ import querystring from "querystring";
 
 const Search = async (req, res) => {
   if (req.method !== "POST")
-    return res.json({
+    return res.status(404).json({
       status_code: 404,
       status_error: true,
       status_message: "Invalid API Route.",

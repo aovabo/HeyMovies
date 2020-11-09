@@ -17,6 +17,8 @@ class Index extends Component {
       isSearching: false,
       searchInput: "",
       searchError: "",
+      nominatedMovies: [],
+      isWaitingForNominations: true,
     };
 
     this.mouseEnterImage = this.mouseEnterImage.bind(this);
@@ -42,10 +44,20 @@ class Index extends Component {
       url: "/api/movies/popular",
     });
 
-    setTimeout(() => {
-      this.state.movies = result.data.status_data.results.slice(0, 5);
-      this.setState(this.state);
-    }, 2000);
+    this.state.movies = result.data.status_data.results.slice(0, 5);
+    this.setState(this.state);
+
+    const nominations = await axios({
+      method: "GET",
+      url: "/api/movies/nominations",
+    });
+
+    this.state.nominatedMovies = nominations.data.status_data.filter(
+      (movie) => movie.nominations > 0
+    );
+    this.state.isWaitingForNominations = false;
+
+    this.setState(this.state);
   }
 
   async search() {
@@ -78,28 +90,22 @@ class Index extends Component {
   render() {
     return (
       <div className="mb-5">
-        <section className="hero is-medium text-white is-bold">
-          <div className="hero-body">
-            <div className="container has-text-centered">
-              <h1 className="title has-text-white">Site Name</h1>
-              <h2 className="subtitle has-text-white">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc
-                consectetur, leo a semper molestie, quam lorem porta urna, et
-                blandit ipsum sem at nibh. Donec velit nisl, congue eu bibendum
-                nec, maximus id felis. Suspendisse risus justo, laoreet non
-                commodo porta, eleifend quis velit. Sed nisi diam, consequat
-                placerat libero nec, elementum commodo leo. Proin vestibulum
-                tortor eros, non venenatis lorem scelerisque non. Vestibulum
-                consequat augue non orci scelerisque scelerisque. Vivamus
-                scelerisque pellentesque ex in mollis. Pellentesque scelerisque
-                ut tellus ac hendrerit. Praesent eros odio, sollicitudin eget
-                justo a, sagittis pellentesque elit. In viverra, urna a finibus
-                porta, velit lectus facilisis dui, sit amet hendrerit turpis
-                lorem ut leo. Integer consectetur egestas magna at euismod.
-              </h2>
-            </div>
+        <div className="columns is-centered">
+          <div className="column is-6">
+            <section className="hero is-medium text-white is-bold">
+              <div className="hero-body">
+                <div className="container has-text-centered">
+                  <h1 className="title has-text-white">Hey Movies</h1>
+                  <h2 className="subtitle has-text-white">
+                    A simple and easy to use Website for searching movies, and
+                    showing the top 5 most popular ones. HeyMovies also provide
+                    a nomination system for users to nominate their liked movie.
+                  </h2>
+                </div>
+              </div>
+            </section>
           </div>
-        </section>
+        </div>
         <div className="container">
           <hr />
         </div>
@@ -109,22 +115,87 @@ class Index extends Component {
             {this.state.movies.length < 1 ? (
               <Loading />
             ) : (
-              <div>
+              <div className="columns is-multiline is-centered">
                 {this.state.movies.map((movie, index) => (
-                  <Link key={index} href={`/movie/${movie.id}`}>
-                    <img
-                      style={{
-                        cursor: this.state.cursor,
-                      }}
-                      onMouseEnter={this.mouseEnterImage}
-                      onMouseLeave={this.mouseLeaveImage}
-                      className="mx-3 mb-3"
-                      src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
-                      width={150}
-                      height={225}
-                    />
-                  </Link>
+                  <center>
+                    <div
+                      key={index}
+                      style={{ width: "150px" }}
+                      className="column is-one-fifth"
+                    >
+                      <Link href={`/movie/${movie.id}`}>
+                        <img
+                          style={{
+                            cursor: this.state.cursor,
+                          }}
+                          onMouseEnter={this.mouseEnterImage}
+                          onMouseLeave={this.mouseLeaveImage}
+                          src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
+                          width={150}
+                          height={225}
+                        />
+                      </Link>
+                      <p
+                        style={{
+                          maxWidth: "150px",
+                        }}
+                        className="has-text-white"
+                      >
+                        {movie.title}
+                      </p>
+                    </div>
+                  </center>
                 ))}
+              </div>
+            )}
+          </div>
+        </section>
+        <div className="container">
+          <hr />
+        </div>
+        <section>
+          <div className="has-text-centered">
+            <h1 className="title has-text-white">Top 5 Nominated Movies</h1>
+            {this.state.isWaitingForNominations ? (
+              <Loading />
+            ) : (
+              <div className="columns is-multiline is-centered">
+                {this.state.nominatedMovies.length < 1 ? (
+                  <p className="subtitle is-5 has-text-white">
+                    There are currently no nominated movies.
+                  </p>
+                ) : (
+                  this.state.nominatedMovies.map((movie, index) => (
+                    <center>
+                      <div
+                        key={index}
+                        style={{ width: "150px" }}
+                        className="column is-one-fifth"
+                      >
+                        <Link href={`/movie/${movie.id}`}>
+                          <img
+                            style={{
+                              cursor: this.state.cursor,
+                            }}
+                            onMouseEnter={this.mouseEnterImage}
+                            onMouseLeave={this.mouseLeaveImage}
+                            src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
+                            width={150}
+                            height={225}
+                          />
+                        </Link>
+                        <p
+                          style={{
+                            maxWidth: "150px",
+                          }}
+                          className="has-text-white"
+                        >
+                          {movie.title} ({movie.nominations.toLocaleString()})
+                        </p>
+                      </div>
+                    </center>
+                  ))
+                )}
               </div>
             )}
           </div>
@@ -195,7 +266,6 @@ class Index extends Component {
                           })`}
                         </p>
                       </div>
-                      {(index + 1) % 5 === 0 ? <br /> : null}
                     </>
                   ))}
                 </div>
